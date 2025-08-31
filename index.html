@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Alerts</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-950 text-white font-sans">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 p-6 bg-gray-900 shadow-lg text-center border-b border-yellow-400">
+    <h1 class="text-4xl font-bold text-yellow-400">🚀 Crypto Alerts</h1>
+    <p class="text-gray-400 mt-2">Acompanhe Bitcoin, Ethereum e Solana em tempo real</p>
+  </header>
+
+  <!-- Summary Cards -->
+  <section class="max-w-6xl mx-auto mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+    <div id="btcCard" class="bg-gray-800 p-6 rounded-2xl shadow-xl border-l-4 border-yellow-400">
+      <h2 class="text-xl font-bold text-yellow-400 mb-2">Bitcoin (BTC)</h2>
+      <p class="text-2xl font-bold" id="btcPrice">R$ --</p>
+      <p class="text-gray-400" id="btcVariation">Variação: --</p>
+      <p class="text-sm italic text-gray-500" id="btcAlert">Último alerta: --</p>
+    </div>
+    <div id="ethCard" class="bg-gray-800 p-6 rounded-2xl shadow-xl border-l-4 border-green-400">
+      <h2 class="text-xl font-bold text-green-400 mb-2">Ethereum (ETH)</h2>
+      <p class="text-2xl font-bold" id="ethPrice">R$ --</p>
+      <p class="text-gray-400" id="ethVariation">Variação: --</p>
+      <p class="text-sm italic text-gray-500" id="ethAlert">Último alerta: --</p>
+    </div>
+    <div id="solCard" class="bg-gray-800 p-6 rounded-2xl shadow-xl border-l-4 border-blue-400">
+      <h2 class="text-xl font-bold text-blue-400 mb-2">Solana (SOL)</h2>
+      <p class="text-2xl font-bold" id="solPrice">R$ --</p>
+      <p class="text-gray-400" id="solVariation">Variação: --</p>
+      <p class="text-sm italic text-gray-500" id="solAlert">Último alerta: --</p>
+    </div>
+  </section>
+
+  <!-- Charts -->
+  <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-lg">
+      <canvas id="btcChart" height="120"></canvas>
+    </div>
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-lg">
+      <canvas id="ethChart" height="120"></canvas>
+    </div>
+    <div class="bg-gray-900 p-6 rounded-2xl shadow-lg">
+      <canvas id="solChart" height="120"></canvas>
+    </div>
+  </main>
+
+  <!-- Table -->
+  <section class="max-w-6xl mx-auto mt-8 p-6 bg-gray-900 rounded-2xl shadow-lg">
+    <h2 class="text-2xl font-bold text-yellow-400 mb-4">📋 Resumo de Preços</h2>
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b border-gray-700 text-gray-400">
+          <th class="py-2">Moeda</th>
+          <th class="py-2">Preço Atual (R$)</th>
+          <th class="py-2">Variação</th>
+          <th class="py-2">Último Alerta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+          <td>Bitcoin (BTC)</td>
+          <td id="btcPriceTable">--</td>
+          <td id="btcVariationTable">--</td>
+          <td id="btcAlertTable">--</td>
+        </tr>
+        <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+          <td>Ethereum (ETH)</td>
+          <td id="ethPriceTable">--</td>
+          <td id="ethVariationTable">--</td>
+          <td id="ethAlertTable">--</td>
+        </tr>
+        <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+          <td>Solana (SOL)</td>
+          <td id="solPriceTable">--</td>
+          <td id="solVariationTable">--</td>
+          <td id="solAlertTable">--</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Footer com assinatura -->
+  <footer class="max-w-6xl mx-auto mt-8 p-6 text-center">
+    <div class="border-t border-gray-700 pt-4">
+      <p class="text-gray-500 text-sm">
+        Criado por <a href="https://github.com/thaynison" target="_blank" rel="noopener" class="text-yellow-400 hover:text-yellow-300 transition-colors">Thaynison Couto</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Custom Alert Modal -->
+  <div id="alertModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+    <div class="bg-gray-800 p-6 rounded-2xl shadow-xl text-center max-w-sm">
+      <h2 id="alertTitle" class="text-xl font-bold text-yellow-400 mb-2">Alerta!</h2>
+      <p id="alertMessage" class="text-gray-200 mb-4">Mensagem do alerta...</p>
+      <button onclick="closeAlert()" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const coins = {
+      btc: { id: "bitcoin", name: "Bitcoin", color: "rgb(255, 206, 86)", chart: null, prices: [] },
+      eth: { id: "ethereum", name: "Ethereum", color: "rgb(34, 197, 94)", chart: null, prices: [] },
+      sol: { id: "solana", name: "Solana", color: "rgb(59, 130, 246)", chart: null, prices: [] },
+    };
+
+    function createChart(ctx, label, color) {
+      return new Chart(ctx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label, data: [], borderColor: color, backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.2)'), tension: 0.3, borderWidth: 2 }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+      });
+    }
+
+    coins.btc.chart = createChart(document.getElementById('btcChart').getContext('2d'), 'Preço BTC (R$)', coins.btc.color);
+    coins.eth.chart = createChart(document.getElementById('ethChart').getContext('2d'), 'Preço ETH (R$)', coins.eth.color);
+    coins.sol.chart = createChart(document.getElementById('solChart').getContext('2d'), 'Preço SOL (R$)', coins.sol.color);
+
+    async function fetchPrices() {
+      try {
+        const ids = Object.values(coins).map(c => c.id).join(",");
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=brl`);
+        return await res.json();
+      } catch (error) {
+        console.error("Erro ao buscar preços:", error);
+        return null;
+      }
+    }
+
+    function checkAlerts(coinKey) {
+      const prices = coins[coinKey].prices;
+      if (prices.length < 2) return;
+
+      let latest = prices[prices.length - 1];
+      let previous = prices[prices.length - 2];
+      let variation = ((latest - previous) / previous) * 100;
+
+      let alertMsg = "--";
+      if (variation <= -2) {
+        alertMsg = "Hora de Comprar!";
+        showAlert(`${coins[coinKey].name}`, `Preço caiu ${variation.toFixed(2)}%`);
+      } else if (variation >= 2) {
+        alertMsg = "Hora de Vender!";
+        showAlert(`${coins[coinKey].name}`, `Preço subiu ${variation.toFixed(2)}%`);
+      }
+
+      document.getElementById(`${coinKey}Alert`).innerText = `Último alerta: ${alertMsg}`;
+      document.getElementById(`${coinKey}AlertTable`).innerText = alertMsg;
+
+      document.getElementById(`${coinKey}Variation`).innerText = `Variação: ${variation.toFixed(2)}%`;
+      document.getElementById(`${coinKey}VariationTable`).innerText = `${variation.toFixed(2)}%`;
+    }
+
+    function showAlert(title, message) {
+      document.getElementById('alertTitle').innerText = title;
+      document.getElementById('alertMessage').innerText = message;
+      document.getElementById('alertModal').classList.remove('hidden');
+    }
+
+    function closeAlert() {
+      document.getElementById('alertModal').classList.add('hidden');
+    }
+
+    async function updateData() {
+      const prices = await fetchPrices();
+      if (!prices) return;
+
+      for (let key in coins) {
+        const coin = coins[key];
+        let price = prices[coin.id].brl;
+        coin.prices.push(price);
+        coin.prices = coin.prices.slice(-20);
+
+        coin.chart.data.labels = Array.from({ length: coin.prices.length }, (_, i) => `T${i+1}`);
+        coin.chart.data.datasets[0].data = coin.prices;
+        coin.chart.update();
+
+        // Atualizar cards & tabela
+        document.getElementById(`${key}Price`).innerText = `R$ ${price.toLocaleString('pt-BR')}`;
+        document.getElementById(`${key}PriceTable`).innerText = `R$ ${price.toLocaleString('pt-BR')}`;
+
+        checkAlerts(key);
+      }
+    }
+
+    updateData();
+    setInterval(updateData, 10000);
+  </script>
+</body>
+</html>
