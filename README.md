@@ -39,4 +39,21 @@ Construído com **HTML + Tailwind CSS + Chart.js** e integrado à **API do CoinG
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/seuusuario/crypto-alerts-dashboard.git
+   git clone https://github.com/seuusuario/crypto-alerts-dashboard.git```
+2. Acesse a pasta do projeto:
+    ```cd crypto-alerts-dashboard```
+3. Abra o arquivo ```index.html``` no navegador.
+4. O dashboard será carregado automaticamente com os dados em tempo real.
+
+## 📡 API
+
+- **CoinGecko API** → https://www.coingecko.com/en/api
+
+## 👨‍💻 Autor
+
+Thaynison Couto da Silva
+📌 Gerente de TI
+🔗 LinkedIn
+
+
+👉 Quer que eu já crie esse `README.md` como **arquivo pronto para download**, para você só arrastar no GitHub junto do HTML?
