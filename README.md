@@ -48,12 +48,3 @@ Construído com **HTML + Tailwind CSS + Chart.js** e integrado à **API do CoinG
 ## 📡 API
 
 - **CoinGecko API** → https://www.coingecko.com/en/api
-
-## 👨‍💻 Autor
-
-Thaynison Couto da Silva
-📌 Gerente de TI
-🔗 LinkedIn
-
-
-👉 Quer que eu já crie esse `README.md` como **arquivo pronto para download**, para você só arrastar no GitHub junto do HTML?
